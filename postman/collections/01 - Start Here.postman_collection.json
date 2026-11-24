@@ -18,7 +18,63 @@
     {
       "name": "Cloud Service App",
       "description": "Obtain a bearer token with repository.Read using https://developer.laserfiche.com/docs/api/authentication/guide_oauth-service/",
-      "item": []
+      "item": [
+        {
+          "name": "Exchange Cloud Service App Authorization Key",
+          "request": {
+            "method": "POST",
+            "url": "{{tokenUrl}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{vault:lf-cloud-authorization-key}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "grant_type",
+                  "value": "client_credentials"
+                },
+                {
+                  "key": "scope",
+                  "value": "{{cloudScopes}}"
+                }
+              ]
+            },
+            "description": "Create the Local Vault secret lf-cloud-authorization-key. Copy only access_token from the response into the local Cloud environment. Keep the response private. https://developer.laserfiche.com/docs/api/authentication/guide_oauth-service/"
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const expected = {'https://api.laserfiche.com/repository/v2':'https://signin.laserfiche.com/oauth/token','https://api.laserfiche.ca/repository/v2':'https://signin.laserfiche.ca/oauth/token','https://api.eu.laserfiche.com/repository/v2':'https://signin.eu.laserfiche.com/oauth/token'};",
+                  "const e = pm.environment;",
+                  "const url = e.get('tokenUrl');",
+                  "if (e.get('deployment') !== 'cloud' || !url || expected[e.get('apiBaseUrl')] !== url) pm.execution.skipRequest();",
+                  "else pm.variables.set('tokenUrl', url);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Access token issued', () => { pm.response.to.have.status(200); pm.expect(pm.response.json().access_token).to.be.a('string').and.not.empty; });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
     },
     {
       "name": "Cloud User Sign-in",
@@ -150,6 +206,12 @@
           }
         }
       ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "cloudScopes",
+      "value": "repository.Read"
     }
   ]
 }
