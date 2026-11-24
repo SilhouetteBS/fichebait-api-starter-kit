@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "03 - Repository API V2 Recipes",
-    "description": "Scaffold for the five guided workflows.",
+    "description": "Cloud V2 recipes for manual execution. Run each request separately and copy returned values as described.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -316,7 +316,7 @@
           "request": {
             "method": "POST",
             "url": "{{apiBaseUrl}}/Repositories/{{repo}}/Entries/{{createdFolderId}}/Folder/Import",
-            "description": "\n\nRequires repository.Write and appropriate repository permissions. https://developer.laserfiche.com/docs/guides/documents-and-folders/guide_importing-documents/",
+            "description": "Select the bundled PDF in Body before sending. The response check detects an empty import.\n\n\n\nRequires repository.Write and appropriate repository permissions. https://developer.laserfiche.com/docs/guides/documents-and-folders/guide_importing-documents/",
             "header": [],
             "body": {
               "mode": "formdata",
@@ -343,14 +343,13 @@
                 "exec": [
                   "if (!/^\\d+$/.test(pm.variables.get('createdFolderId') || '')) { console.error('Set createdFolderId to a numeric ID.'); pm.execution.skipRequest(); }",
                   "if (pm.environment.get('allowWrites') !== 'true') { console.error('Set allowWrites=true in the test environment.'); pm.execution.skipRequest(); }",
-                  "const file = pm.request.body.formdata.all().find(p => p.key === 'file' && !p.disabled);",
                   "const templateName = pm.variables.get('templateName');",
                   "try {",
                   "  const fields = JSON.parse(pm.variables.get('metadataFieldsJson'));",
-                  "  if (!file || !file.src || !templateName || !Array.isArray(fields) || !fields.length || !fields.every(f => f && typeof f.name === 'string' && Array.isArray(f.values))) throw new Error();",
+                  "  if (!templateName || !Array.isArray(fields) || !fields.length || !fields.every(f => f && typeof f.name === 'string' && Array.isArray(f.values))) throw new Error();",
                   "  pm.variables.set('importPayload', JSON.stringify({name:'FicheBait API Sample',autoRename:false,metadata:{templateName,fields}}));",
                   "} catch {",
-                  "  console.error('Select the sample PDF and supply a template and metadata field values.');",
+                  "  console.error('Supply a template and metadata field values.');",
                   "  pm.execution.skipRequest();",
                   "}"
                 ]
@@ -365,6 +364,7 @@
                   "if (![201].includes(pm.response.code)) pm.execution.setNextRequest(null);",
                   "else {",
                   "pm.test('Import has the expected parent and template', () => { const entry = pm.response.json(); pm.expect(String(entry.parentId)).to.eql(String(pm.variables.get('createdFolderId'))); pm.expect(entry.templateName).to.eql(pm.variables.get('templateName')); });",
+                  "pm.test('The PDF was stored as an electronic document', () => { const entry = pm.response.json(); pm.expect(entry.isElectronicDocument).to.be.true; pm.expect(entry.electronicDocumentSize).to.be.above(0); });",
                   "}"
                 ]
               }
@@ -734,6 +734,5 @@
         ]
       }
     }
-  ],
-  "description": "Cloud V2 recipes for manual execution. Run each request separately and copy returned values as described."
+  ]
 }
