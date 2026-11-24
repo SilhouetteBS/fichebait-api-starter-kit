@@ -1,6 +1,6 @@
 # FicheBait API Starter Kit
 
-An independent Postman starter kit for Laserfiche Repository API V2. This scaffold works with the free Postman desktop app. The reference and recipe collections contain planned folders.
+An independent Postman starter kit for Laserfiche Repository API V2. This scaffold works with the free Postman desktop app. The reference and five guided recipes currently target Laserfiche Cloud.
 
 ## Run a connection check
 
@@ -12,4 +12,4 @@ An independent Postman starter kit for Laserfiche Repository API V2. This scaffo
 
 A 401 calls for checking the token and its target deployment. For a 403, check the granted scope and repository rights. For a 404, check the API base URL, region, repository ID, and entry ID. For a self-hosted TLS or network error, connect to the required network and check the server's certificate trust.
 
-The kit has no paid Postman or GitHub dependency. Live connection checks require an existing Laserfiche deployment and authorized access. Live validation is pending.
+The kit has no paid Postman or GitHub dependency. Live connection checks require an existing Laserfiche deployment and authorized access. The Cloud US read-only connection check passed. See the [Cloud walkthroughs](docs/cloud-recipes.md) for recipe setup and validation status.

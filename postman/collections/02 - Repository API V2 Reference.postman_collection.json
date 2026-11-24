@@ -17,33 +17,775 @@
   "item": [
     {
       "name": "Repositories and Folders",
-      "description": "Planned reference requests.",
-      "item": []
+      "description": "Laserfiche Cloud Repository API V2 examples.",
+      "item": [
+        {
+          "name": "List repositories",
+          "request": {
+            "method": "GET",
+            "url": "{{apiBaseUrl}}/Repositories",
+            "description": "Discover repository IDs visible to your Cloud identity.",
+            "header": []
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Expected HTTP status', () => pm.expect([200]).to.include(pm.response.code));",
+                  "if (![200].includes(pm.response.code)) pm.execution.setNextRequest(null);",
+                  "else {",
+                  "",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List folder children",
+          "request": {
+            "method": "GET",
+            "url": "{{apiBaseUrl}}/Repositories/{{repo}}/Entries/{{entryId}}/Folder/Children",
+            "description": "\n\nRequires an authorized repository read token and appropriate repository permissions. https://developer.laserfiche.com/docs/api/repository-api-reference/",
+            "header": []
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (!/^\\d+$/.test(pm.variables.get('entryId') || '')) { console.error('Set entryId to a numeric ID.'); pm.execution.skipRequest(); }"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Expected HTTP status', () => pm.expect([200]).to.include(pm.response.code));",
+                  "if (![200].includes(pm.response.code)) pm.execution.setNextRequest(null);",
+                  "else {",
+                  "",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create test child folder",
+          "request": {
+            "method": "POST",
+            "url": "{{apiBaseUrl}}/Repositories/{{repo}}/Entries/{{testFolderId}}/Folder/Children",
+            "description": "\n\nRequires repository.Write and appropriate repository permissions. https://developer.laserfiche.com/docs/guides/documents-and-folders/guide_creating-folders/",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"entryType\":\"Folder\",\"name\":\"{{newFolderName}}\",\"autoRename\":false}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (!/^\\d+$/.test(pm.variables.get('testFolderId') || '')) { console.error('Set testFolderId to a numeric ID.'); pm.execution.skipRequest(); }",
+                  "if (pm.environment.get('allowWrites') !== 'true') { console.error('Set allowWrites=true in the test environment.'); pm.execution.skipRequest(); }",
+                  "pm.variables.set('newFolderName', 'FicheBait API Test ' + new Date().toISOString().replace(/[:.]/g, '-'));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Expected HTTP status', () => pm.expect([201]).to.include(pm.response.code));",
+                  "if (![201].includes(pm.response.code)) pm.execution.setNextRequest(null);",
+                  "else {",
+                  "pm.test('Created under the configured test folder', () => pm.expect(String(pm.response.json().parentId)).to.eql(String(pm.variables.get('testFolderId'))));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
     },
     {
       "name": "Entries",
-      "description": "Planned reference requests.",
-      "item": []
+      "description": "Laserfiche Cloud Repository API V2 examples.",
+      "item": [
+        {
+          "name": "Read entry",
+          "request": {
+            "method": "GET",
+            "url": "{{apiBaseUrl}}/Repositories/{{repo}}/Entries/{{entryId}}",
+            "description": "\n\nRequires an authorized repository read token and appropriate repository permissions. https://developer.laserfiche.com/docs/api/repository-api-reference/",
+            "header": []
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (!/^\\d+$/.test(pm.variables.get('entryId') || '')) { console.error('Set entryId to a numeric ID.'); pm.execution.skipRequest(); }"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Expected HTTP status', () => pm.expect([200]).to.include(pm.response.code));",
+                  "if (![200].includes(pm.response.code)) pm.execution.setNextRequest(null);",
+                  "else {",
+                  "pm.test('Entry ID matches', () => pm.expect(String(pm.response.json().id)).to.eql(String(pm.variables.get('entryId'))));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List export audit reasons",
+          "request": {
+            "method": "GET",
+            "url": "{{apiBaseUrl}}/Repositories/{{repo}}/AuditReasons",
+            "description": "\n\nRequires an authorized repository read token and appropriate repository permissions. https://developer.laserfiche.com/docs/guides/documents-and-folders/guide_exporting-documents/",
+            "header": []
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Expected HTTP status', () => pm.expect([200]).to.include(pm.response.code));",
+                  "if (![200].includes(pm.response.code)) pm.execution.setNextRequest(null);",
+                  "else {",
+                  "",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
     },
     {
       "name": "Search and Pagination",
-      "description": "Planned reference requests.",
-      "item": []
+      "description": "Laserfiche Cloud Repository API V2 examples.",
+      "item": [
+        {
+          "name": "Find matching entries",
+          "request": {
+            "method": "POST",
+            "url": "{{apiBaseUrl}}/Repositories/{{repo}}/SimpleSearches",
+            "description": "\n\nRequires an authorized repository read token and appropriate repository permissions. https://developer.laserfiche.com/docs/guides/search/",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{{searchPayload}}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const command = pm.variables.get('searchCommand');",
+                  "if (!command) { console.error('Set searchCommand to a Laserfiche search expression scoped to your test folder.'); pm.execution.skipRequest(); }",
+                  "pm.variables.set('searchPayload', JSON.stringify({searchCommand: command}));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Expected HTTP status', () => pm.expect([200]).to.include(pm.response.code));",
+                  "if (![200].includes(pm.response.code)) pm.execution.setNextRequest(null);",
+                  "else {",
+                  "pm.test('Search returned a list', () => pm.expect(pm.response.json().value).to.be.an('array'));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Start asynchronous search",
+          "request": {
+            "method": "POST",
+            "url": "{{apiBaseUrl}}/Repositories/{{repo}}/Searches/SearchAsync",
+            "description": "\n\nRequires an authorized repository read token and appropriate repository permissions. https://developer.laserfiche.com/docs/guides/search/guide_search/",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{{searchPayload}}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const command = pm.variables.get('searchCommand');",
+                  "if (!command) { console.error('Set searchCommand to a Laserfiche search expression scoped to your test folder.'); pm.execution.skipRequest(); }",
+                  "pm.variables.set('searchPayload', JSON.stringify({searchCommand: command}));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Expected HTTP status', () => pm.expect([202]).to.include(pm.response.code));",
+                  "if (![202].includes(pm.response.code)) pm.execution.setNextRequest(null);",
+                  "else {",
+                  "pm.test('Task ID returned', () => pm.expect(pm.response.json().taskId).to.be.a('string').and.not.empty);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Read a search page",
+          "request": {
+            "method": "GET",
+            "url": "{{apiBaseUrl}}/Repositories/{{repo}}/Searches/{{searchTaskId}}/Results?$orderby=id%20asc&$skip={{searchSkip}}&$top={{searchPageSize}}",
+            "description": "\n\nRequires an authorized repository read token and appropriate repository permissions. https://developer.laserfiche.com/docs/guides/search/guide_search/",
+            "header": []
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (!/^[a-f0-9-]{36}$/i.test(pm.variables.get('searchTaskId') || '')) { console.error('Set searchTaskId to the returned task ID.'); pm.execution.skipRequest(); }",
+                  "if (!/^\\d+$/.test(pm.variables.get('searchSkip')) || !/^[1-9]\\d*$/.test(pm.variables.get('searchPageSize')) || Number(pm.variables.get('searchPageSize')) > 150) pm.execution.skipRequest();"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Expected HTTP status', () => pm.expect([200]).to.include(pm.response.code));",
+                  "if (![200].includes(pm.response.code)) pm.execution.setNextRequest(null);",
+                  "else {",
+                  "pm.test('Page contains unique entry IDs', () => { const ids = pm.response.json().value.map(r => r.id); pm.expect(new Set(ids).size).to.eql(ids.length); });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
     },
     {
       "name": "Templates and Fields",
-      "description": "Planned reference requests.",
-      "item": []
+      "description": "Laserfiche Cloud Repository API V2 examples.",
+      "item": [
+        {
+          "name": "Read fields",
+          "request": {
+            "method": "GET",
+            "url": "{{apiBaseUrl}}/Repositories/{{repo}}/Entries/{{entryId}}/Fields",
+            "description": "\n\nRequires an authorized repository read token and appropriate repository permissions. https://developer.laserfiche.com/docs/guides/metadata/guide_write-field-values/",
+            "header": []
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (!/^\\d+$/.test(pm.variables.get('entryId') || '')) { console.error('Set entryId to a numeric ID.'); pm.execution.skipRequest(); }"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Expected HTTP status', () => pm.expect([200]).to.include(pm.response.code));",
+                  "if (![200].includes(pm.response.code)) pm.execution.setNextRequest(null);",
+                  "else {",
+                  "pm.test('Fields are a collection', () => pm.expect(pm.response.json().value).to.be.an('array'));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Replace field values on disposable entry",
+          "request": {
+            "method": "PUT",
+            "url": "{{apiBaseUrl}}/Repositories/{{repo}}/Entries/{{disposableEntryId}}/Fields",
+            "description": "Include all existing field values you want to keep. Omitted values can be cleared.\n\nRequires repository.Write and appropriate repository permissions. https://developer.laserfiche.com/docs/guides/metadata/guide_write-field-values/",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{{replacementPayload}}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (!/^\\d+$/.test(pm.variables.get('disposableEntryId') || '')) { console.error('Set disposableEntryId to a numeric ID.'); pm.execution.skipRequest(); }",
+                  "if (pm.environment.get('allowWrites') !== 'true') { console.error('Set allowWrites=true in the test environment.'); pm.execution.skipRequest(); }",
+                  "try {",
+                  "  const fields = JSON.parse(pm.variables.get('replacementFieldsJson'));",
+                  "  if (!Array.isArray(fields) || fields.length < 3 || !fields.every(f => f && typeof f.name === 'string' && Array.isArray(f.values))) throw new Error();",
+                  "  pm.variables.set('replacementPayload', JSON.stringify({fields}));",
+                  "} catch {",
+                  "  console.error('Set replacementFieldsJson from the complete field snapshot, including the unrelated field to preserve.');",
+                  "  pm.execution.skipRequest();",
+                  "}"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Expected HTTP status', () => pm.expect([200]).to.include(pm.response.code));",
+                  "if (![200].includes(pm.response.code)) pm.execution.setNextRequest(null);",
+                  "else {",
+                  "",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List templates",
+          "request": {
+            "method": "GET",
+            "url": "{{apiBaseUrl}}/Repositories/{{repo}}/TemplateDefinitions",
+            "description": "\n\nRequires an authorized repository read token and appropriate repository permissions. https://developer.laserfiche.com/docs/api/repository-api-reference/",
+            "header": []
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Expected HTTP status', () => pm.expect([200]).to.include(pm.response.code));",
+                  "if (![200].includes(pm.response.code)) pm.execution.setNextRequest(null);",
+                  "else {",
+                  "",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List field definitions",
+          "request": {
+            "method": "GET",
+            "url": "{{apiBaseUrl}}/Repositories/{{repo}}/FieldDefinitions",
+            "description": "\n\nRequires an authorized repository read token and appropriate repository permissions. https://developer.laserfiche.com/docs/api/repository-api-reference/",
+            "header": []
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Expected HTTP status', () => pm.expect([200]).to.include(pm.response.code));",
+                  "if (![200].includes(pm.response.code)) pm.execution.setNextRequest(null);",
+                  "else {",
+                  "",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
     },
     {
       "name": "Import and Export",
-      "description": "Planned reference requests.",
-      "item": []
+      "description": "Laserfiche Cloud Repository API V2 examples.",
+      "item": [
+        {
+          "name": "Import sample PDF with metadata",
+          "request": {
+            "method": "POST",
+            "url": "{{apiBaseUrl}}/Repositories/{{repo}}/Entries/{{createdFolderId}}/Folder/Import",
+            "description": "\n\nRequires repository.Write and appropriate repository permissions. https://developer.laserfiche.com/docs/guides/documents-and-folders/guide_importing-documents/",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": null
+                },
+                {
+                  "key": "request",
+                  "type": "text",
+                  "value": "{{importPayload}}",
+                  "contentType": "application/json"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (!/^\\d+$/.test(pm.variables.get('createdFolderId') || '')) { console.error('Set createdFolderId to a numeric ID.'); pm.execution.skipRequest(); }",
+                  "if (pm.environment.get('allowWrites') !== 'true') { console.error('Set allowWrites=true in the test environment.'); pm.execution.skipRequest(); }",
+                  "const file = pm.request.body.formdata.all().find(p => p.key === 'file' && !p.disabled);",
+                  "const templateName = pm.variables.get('templateName');",
+                  "try {",
+                  "  const fields = JSON.parse(pm.variables.get('metadataFieldsJson'));",
+                  "  if (!file || !file.src || !templateName || !Array.isArray(fields) || !fields.length || !fields.every(f => f && typeof f.name === 'string' && Array.isArray(f.values))) throw new Error();",
+                  "  pm.variables.set('importPayload', JSON.stringify({name:'FicheBait API Sample',autoRename:false,metadata:{templateName,fields}}));",
+                  "} catch {",
+                  "  console.error('Select the sample PDF and supply a template and metadata field values.');",
+                  "  pm.execution.skipRequest();",
+                  "}"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Expected HTTP status', () => pm.expect([201]).to.include(pm.response.code));",
+                  "if (![201].includes(pm.response.code)) pm.execution.setNextRequest(null);",
+                  "else {",
+                  "pm.test('Import has the expected parent and template', () => { const entry = pm.response.json(); pm.expect(String(entry.parentId)).to.eql(String(pm.variables.get('createdFolderId'))); pm.expect(entry.templateName).to.eql(pm.variables.get('templateName')); });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get electronic document download link",
+          "request": {
+            "method": "POST",
+            "url": "{{apiBaseUrl}}/Repositories/{{repo}}/Entries/{{entryId}}/Export",
+            "description": "\n\nRequires an authorized repository read token and appropriate repository permissions. https://developer.laserfiche.com/docs/guides/documents-and-folders/guide_exporting-documents/",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{{exportPayload}}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (!/^\\d+$/.test(pm.variables.get('entryId') || '')) { console.error('Set entryId to a numeric ID.'); pm.execution.skipRequest(); }",
+                  "const auditReasonId = pm.variables.get('exportAuditReasonId');",
+                  "if (auditReasonId && !/^\\d+$/.test(auditReasonId)) pm.execution.skipRequest();",
+                  "pm.variables.set('exportPayload', JSON.stringify({part:'Edoc', ...(auditReasonId ? {auditReasonId:Number(auditReasonId)} : {})}));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Expected HTTP status', () => pm.expect([200]).to.include(pm.response.code));",
+                  "if (![200].includes(pm.response.code)) pm.execution.setNextRequest(null);",
+                  "else {",
+                  "pm.test('Export returned a download link', () => pm.expect(pm.response.json().value).to.be.a('string').and.not.empty);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Start electronic document export",
+          "request": {
+            "method": "POST",
+            "url": "{{apiBaseUrl}}/Repositories/{{repo}}/Entries/{{entryId}}/ExportAsync",
+            "description": "\n\nRequires an authorized repository read token and appropriate repository permissions. https://developer.laserfiche.com/docs/guides/documents-and-folders/guide_exporting-documents/",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{{exportPayload}}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (!/^\\d+$/.test(pm.variables.get('entryId') || '')) { console.error('Set entryId to a numeric ID.'); pm.execution.skipRequest(); }",
+                  "const auditReasonId = pm.variables.get('exportAuditReasonId');",
+                  "if (auditReasonId && !/^\\d+$/.test(auditReasonId)) pm.execution.skipRequest();",
+                  "pm.variables.set('exportPayload', JSON.stringify({part:'Edoc', ...(auditReasonId ? {auditReasonId:Number(auditReasonId)} : {})}));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Expected HTTP status', () => pm.expect([202]).to.include(pm.response.code));",
+                  "if (![202].includes(pm.response.code)) pm.execution.setNextRequest(null);",
+                  "else {",
+                  "pm.test('Export returned a task ID', () => pm.expect(pm.response.json().taskId).to.be.a('string').and.not.empty);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
     },
     {
       "name": "Long-Running Operations",
-      "description": "Planned reference requests.",
-      "item": []
+      "description": "Laserfiche Cloud Repository API V2 examples.",
+      "item": [
+        {
+          "name": "Check task status",
+          "request": {
+            "method": "GET",
+            "url": "{{apiBaseUrl}}/Repositories/{{repo}}/Tasks?taskIds={{searchTaskId}}",
+            "description": "Wait briefly and send again while the task is pending. Stop after 10 attempts and inspect the returned status and errors.\n\nRequires an authorized repository read token and appropriate repository permissions. https://developer.laserfiche.com/docs/api/repository-api-reference/",
+            "header": []
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (!/^[a-f0-9-]{36}$/i.test(pm.variables.get('searchTaskId') || '')) { console.error('Set searchTaskId to the returned task ID.'); pm.execution.skipRequest(); }"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Expected HTTP status', () => pm.expect([200,202]).to.include(pm.response.code));",
+                  "if (![200,202].includes(pm.response.code)) pm.execution.setNextRequest(null);",
+                  "else {",
+                  "pm.test('Task matches', () => pm.expect(pm.response.json().value.some(t => t.id === pm.variables.get('searchTaskId'))).to.be.true);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Check task status",
+          "request": {
+            "method": "GET",
+            "url": "{{apiBaseUrl}}/Repositories/{{repo}}/Tasks?taskIds={{exportTaskId}}",
+            "description": "Wait briefly and send again while the task is pending. Stop after 10 attempts and inspect the returned status and errors.\n\nRequires an authorized repository read token and appropriate repository permissions. https://developer.laserfiche.com/docs/api/repository-api-reference/",
+            "header": []
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (!/^[a-f0-9-]{36}$/i.test(pm.variables.get('exportTaskId') || '')) { console.error('Set exportTaskId to the returned task ID.'); pm.execution.skipRequest(); }"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Expected HTTP status', () => pm.expect([200,202]).to.include(pm.response.code));",
+                  "if (![200,202].includes(pm.response.code)) pm.execution.setNextRequest(null);",
+                  "else {",
+                  "pm.test('Task matches', () => pm.expect(pm.response.json().value.some(t => t.id === pm.variables.get('exportTaskId'))).to.be.true);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "searchCommand",
+      "value": ""
+    },
+    {
+      "key": "searchTaskId",
+      "value": ""
+    },
+    {
+      "key": "searchSkip",
+      "value": "0"
+    },
+    {
+      "key": "searchPageSize",
+      "value": "2"
+    },
+    {
+      "key": "matchedEntryId",
+      "value": ""
+    },
+    {
+      "key": "testFolderId",
+      "value": ""
+    },
+    {
+      "key": "createdFolderId",
+      "value": ""
+    },
+    {
+      "key": "createdEntryId",
+      "value": ""
+    },
+    {
+      "key": "disposableEntryId",
+      "value": ""
+    },
+    {
+      "key": "templateName",
+      "value": ""
+    },
+    {
+      "key": "metadataFieldsJson",
+      "value": "[]"
+    },
+    {
+      "key": "replacementFieldsJson",
+      "value": ""
+    },
+    {
+      "key": "exportTaskId",
+      "value": ""
+    },
+    {
+      "key": "exportAuditReasonId",
+      "value": ""
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "const e = pm.environment;",
+          "const endpoint = e.get('apiBaseUrl') || '';",
+          "if (e.get('deployment') !== 'cloud' || !/^https:\\/\\/api\\.(laserfiche\\.com|laserfiche\\.ca|eu\\.laserfiche\\.com)\\/repository\\/v2$/.test(endpoint) || (pm.info.requestName !== 'List repositories' && !/^r-[a-z0-9]+$/i.test(e.get('repositoryId') || '')) || !e.get('accessToken')) {",
+          "  console.error('Select a configured Cloud environment with a local access token.');",
+          "  pm.execution.skipRequest();",
+          "} else {",
+          "  pm.variables.set('apiBaseUrl', endpoint);",
+          "  pm.variables.set('repo', e.get('repositoryId'));",
+          "  pm.variables.set('accessToken', e.get('accessToken'));",
+          "}"
+        ]
+      }
     }
   ]
 }
