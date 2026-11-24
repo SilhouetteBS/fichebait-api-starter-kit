@@ -48,4 +48,4 @@ Use a disposable folder and a template with an editable single-value field, mult
 
 ## Validation
 
-Cloud US supplied-token connection check passed with HTTP 200 and a matching entry ID. The new token request, reference examples, and recipes require live acceptance. Canada and EU are documented but unverified.
+Cloud US supplied-token connection check passed with HTTP 200 and a matching entry ID. On 2026-11-24, an acceptance script in Postman exercised all five workflows against a Cloud US test repository using a fresh token with repository.Read and repository.Write. The run verified search matches, distinct result pages, PDF import and initial metadata, field updates that preserved the third field, and retrieval of the exported PDF. This validates the API workflows. A clean import followed by manual execution of each shipped recipe, including the file picker, remains pending. Canada and EU are documented but unverified.
