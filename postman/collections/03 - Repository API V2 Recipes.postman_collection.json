@@ -1,0 +1,44 @@
+{
+  "info": {
+    "name": "03 - Repository API V2 Recipes",
+    "description": "Scaffold for the five guided workflows.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{accessToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "01 - Find a document by metadata",
+      "description": "Search a folder by field value and read fields on the matching entry.",
+      "item": []
+    },
+    {
+      "name": "02 - Read a search across multiple pages",
+      "description": "Follow continuation until exhausted or a maximum is reached.",
+      "item": []
+    },
+    {
+      "name": "03 - Upload a PDF and apply metadata",
+      "description": "Create a child folder in a test location, upload the sample, apply metadata, and verify it.",
+      "item": []
+    },
+    {
+      "name": "04 - Update single-value and multivalue fields",
+      "description": "Read, update, and verify the fields on a disposable document.",
+      "item": []
+    },
+    {
+      "name": "05 - Export a document and download the result",
+      "description": "Request export, follow any long operation, and save the file locally.",
+      "item": []
+    }
+  ]
+}

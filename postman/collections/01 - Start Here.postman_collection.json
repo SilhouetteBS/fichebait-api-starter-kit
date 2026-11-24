@@ -1,0 +1,155 @@
+{
+  "info": {
+    "name": "01 - Start Here",
+    "description": "Choose the matching environment and supply a local bearer token. Send only the matching read-only check.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{accessToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Cloud Service App",
+      "description": "Obtain a bearer token with repository.Read using https://developer.laserfiche.com/docs/api/authentication/guide_oauth-service/",
+      "item": []
+    },
+    {
+      "name": "Cloud User Sign-in",
+      "description": "Obtain a user access token using https://developer.laserfiche.com/docs/api/authentication/",
+      "item": []
+    },
+    {
+      "name": "Self-Hosted Username and Password",
+      "description": "Obtain an access token using the installed API Server Swagger UI and https://developer.laserfiche.com/docs/api/server/authentication/",
+      "item": []
+    },
+    {
+      "name": "Self-Hosted LFDS Sign-in",
+      "description": "Configure LFDS and its callback allowlists before obtaining a bearer token. See https://developer.laserfiche.com/docs/api/server/authentication/",
+      "item": []
+    },
+    {
+      "name": "Verify Your Connection",
+      "description": "Choose the request that matches your environment.",
+      "item": [
+        {
+          "name": "Cloud - Read a known entry",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const expected = 'cloud';",
+                  "const env = pm.environment;",
+                  "const base = env.get('apiBaseUrl');",
+                  "const repo = env.get('repositoryId');",
+                  "const entry = env.get('entryId');",
+                  "const token = env.get('accessToken');",
+                  "const validBase = expected === 'cloud' ? /^https:\\/\\/api\\.(laserfiche\\.com|laserfiche\\.ca|eu\\.laserfiche\\.com)\\/repository\\/v2$/.test(base) : /^https:\\/\\/[a-z0-9.-]+(?::[0-9]+)?\\/LFRepositoryAPI\\/v2$/i.test(base);",
+                  "const valid = env.get('deployment') === expected && validBase && repo && /^[0-9]+$/.test(entry) && token;",
+                  "if (!valid) {",
+                  "  console.error('Select the matching environment and set the HTTPS V2 API URL, repository ID, numeric entry ID, and local bearer token.');",
+                  "  pm.execution.skipRequest();",
+                  "} else {",
+                  "  pm.variables.set('apiBaseUrl', base);",
+                  "  pm.variables.set('repositoryPathId', encodeURIComponent(repo));",
+                  "  pm.variables.set('entryId', entry);",
+                  "  pm.variables.set('accessToken', token);",
+                  "}"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('The repository returned HTTP 200', () => pm.response.to.have.status(200));",
+                  "if (pm.response.code === 200) {",
+                  "  pm.test('The response contains the requested entry ID', () => {",
+                  "    pm.expect(String(pm.response.json().id)).to.equal(String(pm.variables.get('entryId')));",
+                  "  });",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiBaseUrl}}/Repositories/{{repositoryPathId}}/Entries/{{entryId}}",
+            "description": "Read a known entry the authenticated identity can access. This does not change repository content."
+          }
+        },
+        {
+          "name": "Self-Hosted - Read a known entry",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const expected = 'self-hosted';",
+                  "const env = pm.environment;",
+                  "const base = env.get('apiBaseUrl');",
+                  "const repo = env.get('repositoryId');",
+                  "const entry = env.get('entryId');",
+                  "const token = env.get('accessToken');",
+                  "const validBase = expected === 'cloud' ? /^https:\\/\\/api\\.(laserfiche\\.com|laserfiche\\.ca|eu\\.laserfiche\\.com)\\/repository\\/v2$/.test(base) : /^https:\\/\\/[a-z0-9.-]+(?::[0-9]+)?\\/LFRepositoryAPI\\/v2$/i.test(base);",
+                  "const valid = env.get('deployment') === expected && validBase && repo && /^[0-9]+$/.test(entry) && token;",
+                  "if (!valid) {",
+                  "  console.error('Select the matching environment and set the HTTPS V2 API URL, repository ID, numeric entry ID, and local bearer token.');",
+                  "  pm.execution.skipRequest();",
+                  "} else {",
+                  "  pm.variables.set('apiBaseUrl', base);",
+                  "  pm.variables.set('repositoryPathId', encodeURIComponent(repo));",
+                  "  pm.variables.set('entryId', entry);",
+                  "  pm.variables.set('accessToken', token);",
+                  "}"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('The repository returned HTTP 200', () => pm.response.to.have.status(200));",
+                  "if (pm.response.code === 200) {",
+                  "  pm.test('The response contains the requested entry ID', () => {",
+                  "    pm.expect(String(pm.response.json().id)).to.equal(String(pm.variables.get('entryId')));",
+                  "  });",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiBaseUrl}}/Repositories/{{repositoryPathId}}/Entries/{{entryId}}",
+            "description": "Read a known entry the authenticated identity can access. This does not change repository content."
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "info": {
+    "name": "02 - Repository API V2 Reference",
+    "description": "Scaffold for curated V2 operations.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{accessToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Repositories and Folders",
+      "description": "Planned reference requests.",
+      "item": []
+    },
+    {
+      "name": "Entries",
+      "description": "Planned reference requests.",
+      "item": []
+    },
+    {
+      "name": "Search and Pagination",
+      "description": "Planned reference requests.",
+      "item": []
+    },
+    {
+      "name": "Templates and Fields",
+      "description": "Planned reference requests.",
+      "item": []
+    },
+    {
+      "name": "Import and Export",
+      "description": "Planned reference requests.",
+      "item": []
+    },
+    {
+      "name": "Long-Running Operations",
+      "description": "Planned reference requests.",
+      "item": []
+    }
+  ]
+}
